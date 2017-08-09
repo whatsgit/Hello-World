@@ -1,1 +1,3 @@
+Updating Beats plugin
+./bin/logstash-plugin update logstash-input-beats
 
