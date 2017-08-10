@@ -1,3 +1,9 @@
 Updating Beats plugin
 ./bin/logstash-plugin update logstash-input-beats
 
+Logstash binary
+/usr/share/logstash/bin/
+
+logstash configs
+/etc/logstash/
+
