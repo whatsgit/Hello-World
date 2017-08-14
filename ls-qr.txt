@@ -1,5 +1,4 @@
-Updating Beats plugin
-./bin/logstash-plugin update logstash-input-beats
+
 
 Logstash binary
 /usr/share/logstash/bin/
@@ -7,3 +6,18 @@ Logstash binary
 logstash configs
 /etc/logstash/
 
+
+At the data source machine, run Filebeat with the following command:
+sudo {fb-binpath}/filebeat -e -c filebeat.yml -d "publish"
+
+
+
+Configuring where Filebeats harvests from
+/etc/filebeat/filebeat.yml
+
+Test Filebeats configuration file
+{fb-binpath}/filebeat/filebeat -configtest -e
+{fb-binpath}/filebeat/filebeat(.sh) -configtest -e
+
+Updating Beats plugin
+{ls-binpath}/logstash-plugin update logstash-input-beats
