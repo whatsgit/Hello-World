@@ -16,7 +16,7 @@ input {
 # optional.
   filter {
         grok{
-            match => { "message" => "%{COMBINEDAPACHELOG}"}
+            match => { "message" => "%{IPV4:clientip} - - \[%{HTTPDATE:log_timestamp}\] "%{DATA:method} %{DATA:target} %{DATA:a_thing} %{DATA:more_things} %{DATA:and_even_more_things} %{DATA:got_it_from} \"%{DATA:ua_string}\""}
         }
         geoip{
              source => "clientip"
@@ -27,9 +27,15 @@ output {
 }
 
 
+##To verify your configuration, run the following command
+/usr/share/logstash/bin/logstash -f first-pipeline.conf --config.test_and_exit
+
+##If the configuration file passes the configuration test, start Logstash with the following command
+/usr/share/logstash/bin/logstash -f first-pipeline.conf --config.reload.automatic
+
 
 ##At the data source machine, run Filebeat with the following command:
-sudo {fb-binpath}/filebeat -e -c filebeat.yml -d "publish"
+sudo /usr/share/filebeat/bin/filebeat -e -c filebeat.yml -d "publish"
 
 
 
@@ -37,9 +43,10 @@ sudo {fb-binpath}/filebeat -e -c filebeat.yml -d "publish"
 /etc/filebeat/filebeat.yml
 
 ##Test Filebeats configuration file
-{fb-binpath}/filebeat/filebeat -configtest -e
-{fb-binpath}/filebeat/filebeat(.sh) -configtest -e
+/usr/share/filebeat/bin/filebeat -configtest -e
+/usr/share/filebeat/bin/filebeat(.sh) -configtest -e
 
 ##Updating Beats plugin
 {ls-binpath}/logstash-plugin update logstash-input-beats
+
 
