@@ -1,23 +1,45 @@
 
 
-Logstash binary
+##Logstash binary
 /usr/share/logstash/bin/
 
-logstash configs
+##logstash configs
 /etc/logstash/
 
+##logstash pipline example w/filebeats
+input {
+    beats {
+        port => "5043"
+    }
+}
+# The filter part of this file is commented out to indicate that it is
+# optional.
+  filter {
+        grok{
+            match => { "message" => "%{COMBINEDAPACHELOG}"}
+        }
+        geoip{
+             source => "clientip"
+        }
+ }
+output {
+    stdout { codec => rubydebug }
+}
 
-At the data source machine, run Filebeat with the following command:
+
+
+##At the data source machine, run Filebeat with the following command:
 sudo {fb-binpath}/filebeat -e -c filebeat.yml -d "publish"
 
 
 
-Configuring where Filebeats harvests from
+##Configuring where Filebeats harvests from
 /etc/filebeat/filebeat.yml
 
-Test Filebeats configuration file
+##Test Filebeats configuration file
 {fb-binpath}/filebeat/filebeat -configtest -e
 {fb-binpath}/filebeat/filebeat(.sh) -configtest -e
 
-Updating Beats plugin
+##Updating Beats plugin
 {ls-binpath}/logstash-plugin update logstash-input-beats
+
