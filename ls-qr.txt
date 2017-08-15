@@ -6,7 +6,7 @@
 ##logstash configs
 /etc/logstash/
 
-##logstash pipline example w/filebeats
+##logstash pipline example w/filebeat locally
 input {
     beats {
         port => "5043"
@@ -14,17 +14,18 @@ input {
 }
 # The filter part of this file is commented out to indicate that it is
 # optional.
-  filter {
-        grok{
-            match => { "message" => "%{IPV4:clientip} - - \[%{HTTPDATE:log_timestamp}\] "%{DATA:method} %{DATA:target} %{DATA:a_thing} %{DATA:more_things} %{DATA:and_even_more_things} %{DATA:got_it_from} \"%{DATA:ua_string}\""}
-        }
-        geoip{
-             source => "clientip"
-        }
- }
-output {
-    stdout { codec => rubydebug }
-}
+#  filter {
+#        grok{
+#            match => { "message" => "%{IPV4:clientip} - - \[%{HTTPDATE:log_timestamp}\] "%{DATA:method} %{DATA:target} %{DATA:a_thing} #%{DATA:more_things} %{DATA:and_even_more_things} %{DATA:got_it_from} \"%{DATA:ua_string}\""}
+#        }
+#        geoip{
+#             source => "clientip"
+#        }
+#        if [continent_code]
+# }
+#output {
+#    stdout { codec => rubydebug }
+#}
 
 
 ##To verify your configuration, run the following command
