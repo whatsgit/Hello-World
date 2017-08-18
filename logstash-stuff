@@ -1,0 +1,171 @@
+input {
+  tcp {
+    port => 514
+    type => syslog
+  }
+  udp {
+    port => 514
+    type => syslog
+  }
+}
+
+filter {
+  if [type] == "syslog" {
+    #### Fortimail ####
+    if [host] == "10.3.1.80" {
+      grok {
+        match => { "message" => "<%{NUMBER:facility}>%{GREEDYDATA:fortimessage}" }
+        remove_field => [ "message" ]
+      }
+      kv {
+        source => "fortimessage"
+        remove_field => [ "fortimessage" ]
+      }
+      mutate {
+        add_field => {
+          "timestamp" => "%{date} %{time}"
+        }
+        remove_field => [ "facility", "date", "time", "log_id" ]
+      }
+      date {
+        match => [ "timestamp", "yyyy-mm-dd HH:mm:ss"]
+        remove_field => [ "timestamp" ]
+      }
+      if [type] == "statistics" {
+        grok {
+          match => { "client_name" => "(?:%{DATA:client_hostname} )?\[%{DATA:client_ip}\]"}
+          remove_field => [ "client_name" ]
+        }
+        mutate {
+          remove_field => [ "session_id" ]
+        }
+        drop {}
+      } 
+      else if [type] == "event" {
+        if [subtype] == "smtp" {
+          drop {}
+        } 
+        else if [subtype] == "webmail" {
+          drop {}
+        } 
+        else if [subtype] == "system" {
+          drop {}
+        } 
+        else if [subtype] == "admin" {
+          drop {}
+        } 
+        else if [subtype] == "update" {
+          drop {}
+        } 
+        else {
+          # drop {}
+        }
+      } 
+      else {
+        # drop {}
+      }
+    }
+    #### Fortigate ####
+    if [host] == "10.3.1.1" {
+      grok {
+        match => { "message" => "<%{NUMBER:facility}>%{GREEDYDATA:fortimessage}" }
+        remove_field => [ "message" ]
+      }
+      kv {
+        source => "fortimessage"
+        remove_field => [ "fortimessage" ]
+      }
+      mutate {
+        add_field => {
+          "timestamp" => "%{date} %{time}"
+        }
+        remove_field => [ "facility", "date", "time" ]
+      }
+      date {
+        match => [ "timestamp", "yyyy-mm-dd HH:mm:ss"]
+        remove_field => [ "timestamp" ]
+      }
+      if [type] == "traffic" {
+        if [subtype] == "allowed" {
+          if [dst] == "10.3.1.5"
+            {
+            
+            }
+          else {
+            drop {}
+          }
+          # drop {}
+        }
+        else if [subtype] == "violation" {
+          drop {}
+        }
+        else if [subtype] == "other" {
+          drop {}
+        }
+        else {
+          # drop {}
+        }
+      } 
+      else if [type] == "event" {
+        if [subtype] == "dns" {
+          drop {}
+        }
+        else if [subtype] == "admin" {
+          drop {}
+        }
+        else if [subtype] == "his-performance" {
+          drop {}
+        }
+        else if [subtype] == "sslvpn-session" {
+          drop {}
+        }
+        else if [subtype] == "sslvpn-user" {
+          drop {}
+        }
+        else if [subtype] == "ha" {
+          drop {}
+        }
+        else {
+          # drop {}
+        }
+      } 
+      else if [type] == "virus" {
+        drop {}
+      }
+      else {
+        # drop {}
+      }
+    }
+    #### Load Balancer ####
+    if [host] == "10.3.1.41" {
+      grok {
+        match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}" }
+        add_field => [ "received_from", "%{host}" ]
+      }
+      date {
+        match => [ "syslog_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" ]
+      }
+      if [syslog_program] == "pound" {
+        grok {
+          match => { "syslog_message" => "%{IP:client} %{WORD:method} %{URIPATHPARAM:request} %{GREEDYDATA:protocol_status}" }
+          remove_field => [ "message", "type", "syslog_message", "syslog_timestamp" ]
+        }
+        drop {}
+      } 
+      else if [syslog_program] == "agetty" {
+        drop {}
+      } 
+      else if [syslog_program] == "CROND" {
+        drop {}
+      } 
+      else {
+        drop {}
+      }
+
+    }
+  }
+}
+
+output {
+  stdout { codec => rubydebug }
+}
