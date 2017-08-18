@@ -50,4 +50,11 @@ sudo /usr/share/filebeat/bin/filebeat -e -c filebeat.yml -d "publish"
 ##Updating Beats plugin
 {ls-binpath}/logstash-plugin update logstash-input-beats
 
-
+##Suggested Apache Filter
+grok {
+   match => [
+         "message" , "%{COMBINEDAPACHELOG}+%{GREEDYDATA:extra_fields}",
+         "message" , "%{COMMONAPACHELOG}+%{GREEDYDATA:extra_fields}"
+   ]
+   overwrite => [ "message" ]
+}
