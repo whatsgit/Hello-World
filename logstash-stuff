@@ -12,7 +12,7 @@ input {
 filter {
   if [type] == "syslog" {
     #### Fortimail ####
-    if [host] == "10.3.1.80" {
+    if [host] == "ipaddy" {
       grok {
         match => { "message" => "<%{NUMBER:facility}>%{GREEDYDATA:fortimessage}" }
         remove_field => [ "message" ]
@@ -66,7 +66,7 @@ filter {
       }
     }
     #### Fortigate ####
-    if [host] == "10.3.1.1" {
+    if [host] == "ipaddy" {
       grok {
         match => { "message" => "<%{NUMBER:facility}>%{GREEDYDATA:fortimessage}" }
         remove_field => [ "message" ]
@@ -137,7 +137,7 @@ filter {
       }
     }
     #### Load Balancer ####
-    if [host] == "10.3.1.41" {
+    if [host] == "ipaddy" {
       grok {
         match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}" }
         add_field => [ "received_from", "%{host}" ]
